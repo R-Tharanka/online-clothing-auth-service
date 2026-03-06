@@ -7,10 +7,25 @@ services:
       dockerfile: Dockerfile
     container_name: online-clothing-auth-service
     ports:
-      - "3000:3000"
+      - "5000:5000"
     env_file:
       - .env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/auth-service
     volumes:
       - .:/app
       - /app/node_modules
     command: npm run dev
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7
+    container_name: auth-service-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
