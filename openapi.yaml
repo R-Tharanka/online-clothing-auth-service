@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: Online Clothing Auth Service API
+  version: 1.0.0
+  description: OpenAPI definition for authentication service endpoints.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
