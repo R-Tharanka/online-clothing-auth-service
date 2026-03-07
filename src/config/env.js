@@ -5,7 +5,7 @@ const loadEnv = () => {
 
 	return {
 		port: process.env.PORT || 5000,
-		mongoUri: process.env.MONGODB_URI,
+		mongoUri: process.env.MONGODB_URI || process.env.MONGO_URI,
 	};
 };
 

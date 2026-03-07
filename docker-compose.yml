@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/auth-service
+      - MONGODB_URI=mongodb+srv://ruchiratharanka1_db_user:6RALWTtrLjFBPWMj@auth-service.nx8m0ea.mongodb.net/?appName=auth-service
     volumes:
       - .:/app
       - /app/node_modules
