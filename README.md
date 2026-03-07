@@ -6,7 +6,7 @@ Production-style authentication microservice for CTSE Assignment 1.
 - Register, login, logout, refresh tokens
 - Password reset request + perform (email stub)
 - Role assignment and role-based guards
-- GET /me, GET /api/auth/users/:id (admin), public user lookup
+- GET /me, GET /api/auth/users/:id (shop_owner), public user lookup
 - Health endpoint and structured logging
 - OpenAPI contract and Swagger UI
 - Docker + docker-compose for local dev

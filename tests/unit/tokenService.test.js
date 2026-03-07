@@ -19,7 +19,7 @@ describe("tokenService", () => {
 	});
 
 	it("signs and verifies refresh token", () => {
-		const user = { _id: "user-456", roles: ["admin"] };
+		const user = { _id: "user-456", roles: ["shop_owner"] };
 		const token = tokenService.signRefreshToken(user);
 		const payload = tokenService.verifyRefreshToken(token);
 

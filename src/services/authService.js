@@ -12,7 +12,7 @@ const createError = (statusCode, message) => {
 	return error;
 };
 
-const allowedRoles = ["customer", "shop_owner", "admin"];
+const allowedRoles = ["customer", "shop_owner"];
 
 const sanitizeUser = (user) => ({
 	id: user._id.toString(),

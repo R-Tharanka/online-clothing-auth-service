@@ -153,7 +153,7 @@ paths:
   /api/auth/users/{id}:
     get:
       tags: [Users]
-      summary: Get user by ID (admin)
+      summary: Get user by ID (shop_owner)
       security:
         - bearerAuth: []
       parameters:
@@ -189,7 +189,7 @@ paths:
   /api/auth/users/{id}/roles:
     post:
       tags: [Users]
-      summary: Add role to user (admin)
+      summary: Add role to user (shop_owner)
       security:
         - bearerAuth: []
       parameters:
@@ -215,7 +215,7 @@ paths:
           $ref: "#/components/responses/NotFound"
     delete:
       tags: [Users]
-      summary: Remove role from user (admin)
+      summary: Remove role from user (shop_owner)
       security:
         - bearerAuth: []
       parameters:
