@@ -1,16 +1,16 @@
 // Swap this module with pino/winston in production if desired.
 const formatMessage = (level, message, meta) => {
-	const payload = {
-		timestamp: new Date().toISOString(),
-		level,
-		message,
-	};
+	const timestamp = new Date().toISOString();
+	let line = `[${timestamp}] ${level.toUpperCase()} ${message}`;
 
 	if (meta && Object.keys(meta).length > 0) {
-		payload.meta = meta;
+		const pairs = Object.entries(meta)
+			.map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+			.join(" ");
+		line = `${line} ${pairs}`;
 	}
 
-	return JSON.stringify(payload);
+	return line;
 };
 
 const info = (message, meta) => {

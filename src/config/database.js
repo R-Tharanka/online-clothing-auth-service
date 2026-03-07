@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 
 let isConnected = false;
 
@@ -19,11 +20,21 @@ const connectDatabase = async () => {
 	let lastError;
 	for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
 		try {
+			logger.info("mongodb_connect_attempt", {
+				attempt,
+				maxRetries,
+			});
 			await mongoose.connect(uri);
 			isConnected = true;
+			logger.info("mongodb_connected", { attempt });
 			return;
 		} catch (error) {
 			lastError = error;
+			logger.warn("mongodb_connect_failed", {
+				attempt,
+				maxRetries,
+				error: error.message,
+			});
 			await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
 		}
 	}
