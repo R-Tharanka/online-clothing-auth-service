@@ -3,14 +3,13 @@
 Production-style authentication microservice for CTSE Assignment 1.
 
 ## Features
-- Register, login, logout, refresh tokens
-- Password reset request + perform (email stub)
-- Role assignment and role-based guards
-- GET /me, GET /api/auth/users, GET /api/auth/users/:id (shop_owner)
-- Health endpoint and structured logging
+- Register, login, logout, refresh tokens (single-use refresh with rotation)
+- Password reset request + perform (token is logged; email delivery is a stub)
+- Role assignment and role-based guards (roles: customer, shop_owner)
+- Protected user endpoints (requires bearer access token)
+- Health endpoint, JSON HTTP request logging, and correlation IDs
 - OpenAPI contract and Swagger UI
 - Docker + docker-compose for local dev
-- CI pipeline with SAST (Snyk) and Docker image build
 
 ## Quick Start
 ```bash
@@ -22,6 +21,12 @@ npm run dev
 Swagger UI: http://localhost:5000/api-docs
 Health check: http://localhost:5000/health
 
+## Scripts
+- `npm run dev` - start with nodemon
+- `npm start` - start with node
+- `npm run test` - Jest tests
+- `npm run lint` - ESLint
+
 ## Docker (local dev)
 ```bash
 docker compose up --build
@@ -31,13 +36,21 @@ docker compose up --build
 See [.env.example](.env.example).
 
 Required:
-- `MONGODB_URI`
-- `JWT_PRIVATE_KEY` + `JWT_PUBLIC_KEY` (preferred)
-  - If missing, the service falls back to `JWT_SECRET` (HS256) and logs a warning.
+- `MONGODB_URI` (or `MONGO_URI`)
+- JWT config:
+  - Preferred: `JWT_PRIVATE_KEY` + `JWT_PUBLIC_KEY` (RS256)
+  - Fallback: `JWT_SECRET` (HS256, warning logged)
 
 Token TTLs:
 - `ACCESS_TOKEN_TTL` (default 15m)
 - `REFRESH_TOKEN_TTL` (default 7d)
+
+Mongo connection retry:
+- `MONGODB_CONNECT_RETRIES` (default 5)
+- `MONGODB_CONNECT_DELAY_MS` (default 2000)
+
+Port:
+- `PORT` (default 5000)
 
 ## RSA Key Generation (RS256)
 ```bash
@@ -51,29 +64,25 @@ cat private_key.pem | sed ':a;N;$!ba;s/\n/\\n/g'
 cat public_key.pem | sed ':a;N;$!ba;s/\n/\\n/g'
 ```
 
-**Security Note:** Store private keys in a secret manager (do not commit).
+Security note: store private keys in a secret manager (do not commit).
+
+## Token Claims
+Access and refresh tokens include:
+- `userId`
+- `roles` (array)
+- `tokenType` (refresh tokens only)
 
 ## Password Reset
-- `POST /api/auth/password-reset-request` generates a single-use token.
-- Email sending is stubbed; integrate SendGrid/SES where indicated.
+- `POST /api/auth/password-reset-request` creates a single-use token and logs it.
+- `POST /api/auth/password-reset` verifies token, updates password, and revokes refresh tokens.
 
-## Interservice Contract
-- Use `X-Request-ID` for correlation in downstream services.
+## Roles and Access
+- Supported roles: `customer`, `shop_owner`.
+- Admin-only routes use `requireRoles("shop_owner")` ("admin" is normalized to `shop_owner`).
 
-## CI / DevSecOps
-GitHub Actions workflow runs lint, tests, Snyk SAST, and Docker build/push.
-
-Required secrets:
-- `SNYK_TOKEN`
-- `REGISTRY_URL`, `REGISTRY_USER`, `REGISTRY_PASS`
-
-Optional:
-- Add a deploy step with cloud CLI and required secrets.
-
-## Security Notes
-- Enforce HTTPS in production.
-- Add rate limiting on auth endpoints (middleware placeholder).
-- Avoid logging sensitive values (passwords, tokens, secrets).
+## Observability
+- Every request gets an `x-request-id` header (incoming value is preserved or generated).
+- HTTP logs are JSON lines with request id, status, and duration.
 
 ## API Docs
 The OpenAPI contract is defined in [openapi.yaml](openapi.yaml) and served via `/api-docs`.
