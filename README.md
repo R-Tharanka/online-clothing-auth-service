@@ -1,6 +1,7 @@
 # Online Clothing Auth Service
 
-Production-style authentication microservice for CTSE Assignment 1.
+## Overview
+Authentication and user identity service for the Veloura online clothing platform. This repository contains a single microservice within a larger microservices-based system that includes other services. Provides user registration, login, token-based sessions, role checks, and password reset flows with an OpenAPI contract for client integration.
 
 ## Features
 - Register, login, logout, refresh tokens (single-use refresh with rotation)
