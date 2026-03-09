@@ -1,6 +1,6 @@
 const logger = require("../utils/logger");
 
-const errorMiddleware = (err, req, res, next) => {
+const errorMiddleware = (err, req, res) => {
 	const status = err.statusCode || 500;
 	const message = err.message || "Internal server error";
 
