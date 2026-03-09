@@ -9,6 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        working-directory: online-clothing-auth-service
 
     steps:
       - name: Checkout
@@ -19,6 +25,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: online-clothing-auth-service/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -30,6 +37,7 @@ jobs:
         run: npm test
 
       - name: Snyk SAST
+        if: ${{ secrets.SNYK_TOKEN != '' }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
@@ -37,14 +45,15 @@ jobs:
           snyk test --severity-threshold=critical
 
       - name: Docker login
-        if: ${{ secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
+        if: ${{ github.event_name == 'push' && secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
         run: echo ${{ secrets.REGISTRY_PASS }} | docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USER }} --password-stdin
 
       - name: Build Docker image
+        if: ${{ github.event_name == 'push' && secrets.REGISTRY_URL != '' }}
         run: docker build -t ${{ secrets.REGISTRY_URL }}/auth-service:${{ github.sha }} .
 
       - name: Push Docker image
-        if: ${{ secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
+        if: ${{ github.event_name == 'push' && secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
         run: docker push ${{ secrets.REGISTRY_URL }}/auth-service:${{ github.sha }}
 
       - name: Deploy (placeholder)
