@@ -6,7 +6,7 @@ Production-style authentication microservice for CTSE Assignment 1.
 - Register, login, logout, refresh tokens
 - Password reset request + perform (email stub)
 - Role assignment and role-based guards
-- GET /me, GET /api/auth/users/:id (shop_owner), public user lookup
+- GET /me, GET /api/auth/users, GET /api/auth/users/:id (shop_owner)
 - Health endpoint and structured logging
 - OpenAPI contract and Swagger UI
 - Docker + docker-compose for local dev
@@ -58,7 +58,6 @@ cat public_key.pem | sed ':a;N;$!ba;s/\n/\\n/g'
 - Email sending is stubbed; integrate SendGrid/SES where indicated.
 
 ## Interservice Contract
-- `GET /api/auth/public/users/:id` returns minimal user info for other services.
 - Use `X-Request-ID` for correlation in downstream services.
 
 ## CI / DevSecOps
