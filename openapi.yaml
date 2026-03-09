@@ -78,6 +78,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RefreshResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
   /api/auth/logout:
@@ -116,6 +118,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/auth/password-reset:
     post:
       tags: [Auth]
@@ -150,6 +154,8 @@ paths:
                 $ref: "#/components/schemas/UserResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/auth/users:
     get:
       tags: [Users]
@@ -190,6 +196,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListUsersResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -236,6 +244,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -262,6 +272,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -325,9 +337,12 @@ components:
       properties:
         email:
           type: string
+          format: email
           example: user@example.com
         password:
           type: string
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
           example: StrongPass1
         name:
           type: string
@@ -338,6 +353,7 @@ components:
       properties:
         email:
           type: string
+          format: email
         password:
           type: string
     RefreshRequest:
@@ -352,16 +368,20 @@ components:
       properties:
         email:
           type: string
+          format: email
     PasswordResetPerform:
       type: object
       required: [email, token, newPassword]
       properties:
         email:
           type: string
+          format: email
         token:
           type: string
         newPassword:
           type: string
+          minLength: 8
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
           example: StrongPass2
     RoleRequest:
       type: object
@@ -369,6 +389,7 @@ components:
       properties:
         role:
           type: string
+          enum: [customer, shop_owner]
           example: shop_owner
     ListUsersResponse:
       type: object
@@ -423,12 +444,14 @@ components:
           type: string
         email:
           type: string
+          format: email
         name:
           type: string
         roles:
           type: array
           items:
             type: string
+            enum: [customer, shop_owner]
         createdAt:
           type: string
           format: date-time
