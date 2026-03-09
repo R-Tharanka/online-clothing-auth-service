@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+      REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+      REGISTRY_PASS: ${{ secrets.REGISTRY_PASS }}
 
     defaults:
       run:
@@ -37,24 +42,24 @@ jobs:
         run: npm test
 
       - name: Snyk SAST
-        if: ${{ secrets.SNYK_TOKEN != '' }}
+        if: ${{ env.SNYK_TOKEN != '' }}
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ env.SNYK_TOKEN }}
         run: |
           npm install -g snyk
           snyk test --severity-threshold=critical
 
       - name: Docker login
-        if: ${{ github.event_name == 'push' && secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
-        run: echo ${{ secrets.REGISTRY_PASS }} | docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USER }} --password-stdin
+        if: ${{ github.event_name == 'push' && env.REGISTRY_USER != '' && env.REGISTRY_PASS != '' && env.REGISTRY_URL != '' }}
+        run: echo ${{ env.REGISTRY_PASS }} | docker login ${{ env.REGISTRY_URL }} -u ${{ env.REGISTRY_USER }} --password-stdin
 
       - name: Build Docker image
-        if: ${{ github.event_name == 'push' && secrets.REGISTRY_URL != '' }}
-        run: docker build -t ${{ secrets.REGISTRY_URL }}/auth-service:${{ github.sha }} .
+        if: ${{ github.event_name == 'push' && env.REGISTRY_URL != '' }}
+        run: docker build -t ${{ env.REGISTRY_URL }}/auth-service:${{ github.sha }} .
 
       - name: Push Docker image
-        if: ${{ github.event_name == 'push' && secrets.REGISTRY_USER != '' && secrets.REGISTRY_PASS != '' && secrets.REGISTRY_URL != '' }}
-        run: docker push ${{ secrets.REGISTRY_URL }}/auth-service:${{ github.sha }}
+        if: ${{ github.event_name == 'push' && env.REGISTRY_USER != '' && env.REGISTRY_PASS != '' && env.REGISTRY_URL != '' }}
+        run: docker push ${{ env.REGISTRY_URL }}/auth-service:${{ github.sha }}
 
       - name: Deploy (placeholder)
         if: ${{ false }}
