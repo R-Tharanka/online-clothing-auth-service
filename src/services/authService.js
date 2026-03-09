@@ -209,6 +209,32 @@ const getMe = async (userId) => {
 	return { user: sanitizeUser(user) };
 };
 
+const listUsers = async ({ search = "", role = "", page = "1", limit = "20" }) => {
+	const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+	const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+
+	if (role && !allowedRoles.includes(role)) {
+		throw createError(400, "Invalid role");
+	}
+
+	const { users, total } = await userRepository.listUsers({
+		search: String(search || "").trim(),
+		role: String(role || "").trim(),
+		page: parsedPage,
+		limit: parsedLimit,
+	});
+
+	const totalPages = Math.max(Math.ceil(total / parsedLimit), 1);
+
+	return {
+		users: users.map(sanitizeUser),
+		page: parsedPage,
+		limit: parsedLimit,
+		total,
+		totalPages,
+	};
+};
+
 const getUserById = async (userId) => {
 	const user = await userRepository.findById(userId);
 	if (!user) {
@@ -216,22 +242,6 @@ const getUserById = async (userId) => {
 	}
 
 	return { user: sanitizeUser(user) };
-};
-
-const getPublicUserById = async (userId) => {
-	const user = await userRepository.findById(userId);
-	if (!user) {
-		throw createError(404, "User not found");
-	}
-
-	return {
-		user: {
-			id: user._id.toString(),
-			email: user.email,
-			name: user.name,
-			roles: user.roles,
-		},
-	};
 };
 
 const addRole = async (userId, { role }) => {
@@ -274,8 +284,8 @@ module.exports = {
 	passwordResetRequest,
 	passwordReset,
 	getMe,
+	listUsers,
 	getUserById,
-	getPublicUserById,
 	addRole,
 	removeRole,
 };

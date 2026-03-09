@@ -63,18 +63,18 @@ const getMe = async (req, res, next) => {
 	}
 };
 
-const getUserById = async (req, res, next) => {
+const listUsers = async (req, res, next) => {
 	try {
-		const result = await authService.getUserById(req.params.id);
+		const result = await authService.listUsers(req.query);
 		res.status(200).json(result);
 	} catch (error) {
 		next(error);
 	}
 };
 
-const getPublicUserById = async (req, res, next) => {
+const getUserById = async (req, res, next) => {
 	try {
-		const result = await authService.getPublicUserById(req.params.id);
+		const result = await authService.getUserById(req.params.id);
 		res.status(200).json(result);
 	} catch (error) {
 		next(error);
@@ -107,8 +107,8 @@ module.exports = {
 	passwordResetRequest,
 	passwordReset,
 	getMe,
+	listUsers,
 	getUserById,
-	getPublicUserById,
 	addRole,
 	removeRole,
 };

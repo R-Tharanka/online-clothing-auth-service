@@ -69,6 +69,26 @@ const findByRefreshTokenHash = async (tokenHash) => {
 	return User.findOne({ "refreshTokens.tokenHash": tokenHash });
 };
 
+const listUsers = async ({ search, role, page, limit }) => {
+	const filter = {};
+	if (search) {
+		const regex = new RegExp(search, "i");
+		filter.$or = [{ email: regex }, { name: regex }];
+	}
+	if (role) {
+		filter.roles = role;
+	}
+
+	const skip = (page - 1) * limit;
+
+	const [users, total] = await Promise.all([
+		User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+		User.countDocuments(filter),
+	]);
+
+	return { users, total };
+};
+
 module.exports = {
 	createUser,
 	findByEmail,
@@ -82,4 +102,5 @@ module.exports = {
 	revokeRefreshToken,
 	clearRefreshTokens,
 	findByRefreshTokenHash,
+	listUsers,
 };
