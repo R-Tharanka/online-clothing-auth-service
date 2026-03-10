@@ -46,25 +46,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Trigger Railway deployment (via webhook)
-        if: ${{ secrets.RAILWAY_DEPLOY_WEBHOOK_URL != '' }}
-        env:
-          RAILWAY_DEPLOY_WEBHOOK_URL: ${{ secrets.RAILWAY_DEPLOY_WEBHOOK_URL }}
-          IMAGE: ghcr.io/${{ github.repository_owner }}/online-clothing-auth-service:${{ github.sha }}
-          IMAGE_LATEST: ghcr.io/${{ github.repository_owner }}/online-clothing-auth-service:latest
-        run: |
-          echo "Calling Railway deploy webhook..."
-          # Send JSON payload with the image name (Railway will accept a simple POST; this payload is harmless even if not used)
-          payload="{\"image\":\"$IMAGE\",\"image_latest\":\"$IMAGE_LATEST\",\"ref\":\"${GITHUB_REF}\",\"commit\":\"${GITHUB_SHA}\"}"
-          # Use -sSf to show errors; fail job if webhook returns non-2xx
-          curl -sSf -X POST "$RAILWAY_DEPLOY_WEBHOOK_URL" \
-            -H "Content-Type: application/json" \
-            -d "$payload"
-          echo "Webhook posted successfully."
-
-      - name: Skip Railroad deploy (webhook not configured)
-        if: ${{ secrets.RAILWAY_DEPLOY_WEBHOOK_URL == '' }}
-        run: |
-          echo "::warning ::RAILWAY_DEPLOY_WEBHOOK_URL secret is not set. Skipping remote deploy."
-          echo "If Railway is set to auto-deploy from the GitHub repo you may not need a webhook."
