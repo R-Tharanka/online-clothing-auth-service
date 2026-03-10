@@ -54,18 +54,24 @@ Port:
 - `PORT` (default 5000)
 
 ## RSA Key Generation (RS256)
+
+### Option A: Node.js (works on any OS with Node)
 ```bash
-openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in private_key.pem -pubout -out public_key.pem
+node -e "const fs=require('fs');const {generateKeyPairSync}=require('crypto');const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:2048,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});fs.writeFileSync('jwt_private.pem',privateKey);fs.writeFileSync('jwt_public.pem',publicKey);console.log('Generated jwt_private.pem and jwt_public.pem');"
 ```
 
-Convert for `.env` usage:
+### Option B: OpenSSL
 ```bash
-cat private_key.pem | sed ':a;N;$!ba;s/\n/\\n/g'
-cat public_key.pem | sed ':a;N;$!ba;s/\n/\\n/g'
+openssl genpkey -algorithm RSA -out jwt_private.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem
 ```
 
-Security note: store private keys in a secret manager (do not commit).
+### Convert for `.env` usage
+```bash
+node -e "const fs=require('fs');const p=fs.readFileSync('jwt_private.pem','utf8').trim().replace(/\n/g,'\\n');const u=fs.readFileSync('jwt_public.pem','utf8').trim().replace(/\n/g,'\\n');console.log('JWT_PRIVATE_KEY='+p);console.log('JWT_PUBLIC_KEY='+u);"
+```
+
+Security note: store private keys in a secret manager and do not commit them.
 
 ## Token Claims
 Access and refresh tokens include:
