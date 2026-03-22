@@ -12,6 +12,20 @@ Authentication and user identity service for the Veloura online clothing platfor
 - OpenAPI contract and Swagger UI
 - Docker + docker-compose for local dev
 
+## Related Repositories
+- Auth service (this repo): https://github.com/R-Tharanka/online-clothing-auth-service.git
+- Frontend: https://github.com/R-Tharanka/online-shop-frontend.git
+- Product service: https://github.com/navogamage/Veloura-Product-Service-CTSE-Assignment01.git
+- Order service: https://github.com/GunathungaPCI/Veloura-Order-Service-Y4S1-SE-CTSE-Assignment.git
+- Payment + contact service: https://github.com/SHAKIR2001/veloura_payment_contactUs-backend.git
+
+## Deployed URL
+Base URL: https://online-clothing-auth-service-production.up.railway.app/
+
+Useful endpoints:
+- Swagger UI: https://online-clothing-auth-service-production.up.railway.app/api-docs
+- Health: https://online-clothing-auth-service-production.up.railway.app/health
+
 ## Quick Start
 ```bash
 npm install
